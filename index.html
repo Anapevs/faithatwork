@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faith at Work Self-Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #4a1870;
+    --purple-light: #6b2f99;
+    --gold: #b8962e;
+    --gold-light: #d4ab4a;
+    --bg: #fafaf8;
+    --text: #2c2c2c;
+    --muted: #9e9e9e;
+    --border: #e0dcd5;
+    --choice-bg: #f5f3ef;
+    --choice-hover: #ede9e2;
+    --choice-selected: #4a1870;
+    --choice-selected-text: #fff;
+  }
+ 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+ 
+  /* Progress bar */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--gold);
+    transition: width 0.5s ease;
+    z-index: 100;
+  }
+ 
+  /* Screens */
+  .screen {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 60px 80px;
+    max-width: 780px;
+    margin: 0 auto;
+    width: 100%;
+    animation: fadeSlideIn 0.4s ease forwards;
+  }
+  .screen.active { display: flex; }
+ 
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+ 
+  /* Welcome screen */
+  .welcome-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 1.2rem;
+    line-height: 1.25;
+  }
+ 
+  .welcome-desc {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 2.4rem;
+    max-width: 560px;
+  }
+ 
+  /* Question screen */
+  .q-number {
+    font-size: 0.85rem;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .q-number .arrow { color: var(--gold-light); font-size: 1rem; }
+ 
+  .q-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: var(--purple);
+    line-height: 1.35;
+    margin-bottom: 2rem;
+    max-width: 640px;
+  }
+ 
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 640px;
+    margin-bottom: 2rem;
+  }
+ 
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--choice-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 0.97rem;
+    line-height: 1.5;
+    color: var(--text);
+    user-select: none;
+  }
+  .choice:hover { background: var(--choice-hover); border-color: var(--gold-light); }
+  .choice.selected {
+    background: var(--choice-selected);
+    border-color: var(--choice-selected);
+    color: var(--choice-selected-text);
+  }
+  .choice.selected .choice-letter { color: rgba(255,255,255,0.6); border-color: rgba(255,255,255,0.4); }
+ 
+  .choice-letter {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--gold);
+    border: 1.5px solid var(--gold-light);
+    border-radius: 3px;
+    padding: 1px 6px;
+    min-width: 24px;
+    text-align: center;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+ 
+  /* Text input screens */
+  .text-input-field {
+    width: 100%;
+    max-width: 520px;
+    border: none;
+    border-bottom: 2px solid var(--border);
+    background: transparent;
+    font-size: 1.2rem;
+    font-family: 'Lato', sans-serif;
+    color: var(--text);
+    padding: 10px 0;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 2rem;
+  }
+  .text-input-field::placeholder { color: var(--muted); }
+  .text-input-field:focus { border-bottom-color: var(--gold); }
+ 
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--purple);
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn:hover { background: var(--purple-light); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+ 
+  .btn-hint {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-left: 14px;
+  }
+  .btn-hint strong { color: var(--text); }
+ 
+  /* Nav row */
+  .nav-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+ 
+  .btn-ok {
+    background: var(--purple);
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-ok:hover { background: var(--purple-light); }
+  .btn-ok:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ok svg { width: 14px; height: 14px; }
+ 
+  /* Statement screen */
+  .statement-icon {
+    font-size: 2.4rem;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+  }
+  .statement-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 0.8rem;
+    line-height: 1.35;
+  }
+  .statement-body {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 2rem;
+  }
+ 
+  /* Results screen */
+  .results-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 0.5rem;
+  }
+  .profile-label {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    font-family: 'Playfair Display', serif;
+  }
+  .results-desc {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: #555;
+    max-width: 580px;
+    margin-bottom: 2rem;
+  }
+  .score-display {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+ 
+  /* Sending overlay */
+  .sending-overlay {
+    position: fixed; inset: 0;
+    background: rgba(250,250,248,0.9);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 200;
+    display: none;
+  }
+  .sending-overlay.visible { display: flex; }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-bottom: 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+ 
+  /* Error */
+  .error-msg {
+    font-size: 0.85rem;
+    color: #c0392b;
+    margin-top: 6px;
+    display: none;
+  }
+  .error-msg.visible { display: block; }
+ 
+  @media (max-width: 640px) {
+    .screen { padding: 40px 24px; }
+    .welcome-title { font-size: 1.8rem; }
+    .q-title { font-size: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+ 
+<div class="progress-bar" id="progressBar" style="width:0%"></div>
+<div class="sending-overlay" id="sendingOverlay">
+  <div class="spinner"></div>
+  <p style="color:var(--purple);font-weight:600;font-family:'Lato',sans-serif;">Sending your results…</p>
+</div>
+ 
+<!-- WELCOME -->
+<div class="screen active" id="screen-welcome">
+  <h1 class="welcome-title">Faith at Work<br>Self-Assessment</h1>
+  <p class="welcome-desc">Work takes up a third of our waking lives. And yet, for many of us, faith and work exist in separate compartments, one for Sunday, one for Monday. This quiz invites you to pause and honestly examine how much God's presence, purpose, and perspective are woven into the way you lead, decide, and relate to others every day.</p>
+  <div style="display:flex;align-items:center;">
+    <button class="btn" onclick="startQuiz()">Start</button>
+    <span class="btn-hint">press <strong>Enter ↵</strong></span>
+  </div>
+</div>
+ 
+<!-- QUESTION TEMPLATE (rendered by JS) -->
+<div class="screen" id="screen-question">
+  <div class="q-number"><span id="qNum"></span><span class="arrow">→</span></div>
+  <h2 class="q-title" id="qTitle"></h2>
+  <div class="choices" id="choicesContainer"></div>
+  <div class="nav-row">
+    <button class="btn-ok" id="btnOk" onclick="nextStep()" disabled>
+      OK
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+    <span class="btn-hint">press <strong>Enter ↵</strong></span>
+  </div>
+</div>
+ 
+<!-- STATEMENT (gate before name/email) -->
+<div class="screen" id="screen-statement">
+  <div class="statement-icon">"</div>
+  <h2 class="statement-title">You're one step away from your results.</h2>
+  <p class="statement-body">Enter your name and email to see your Faith at Work profile and to join a community of leaders who are learning to let God lead at work too.</p>
+  <div style="display:flex;align-items:center;">
+    <button class="btn" onclick="goToName()">Continue</button>
+    <span class="btn-hint">press <strong>Enter ↵</strong></span>
+  </div>
+</div>
+ 
+<!-- FIRST NAME -->
+<div class="screen" id="screen-firstname">
+  <div class="q-number"><span>8</span><span class="arrow">→</span></div>
+  <h2 class="q-title" style="font-size:1.5rem;">First Name*</h2>
+  <input type="text" class="text-input-field" id="inputFirstName" placeholder="Type your answer here..." autocomplete="given-name">
+  <div class="error-msg" id="errFirstName">Please enter your first name.</div>
+  <div class="nav-row">
+    <button class="btn-ok" onclick="goToLastName()">
+      OK
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+    <span class="btn-hint">press <strong>Enter ↵</strong></span>
+  </div>
+</div>
+ 
+<!-- LAST NAME -->
+<div class="screen" id="screen-lastname">
+  <div class="q-number"><span>9</span><span class="arrow">→</span></div>
+  <h2 class="q-title" style="font-size:1.5rem;">Last Name*</h2>
+  <input type="text" class="text-input-field" id="inputLastName" placeholder="Type your answer here..." autocomplete="family-name">
+  <div class="error-msg" id="errLastName">Please enter your last name.</div>
+  <div class="nav-row">
+    <button class="btn-ok" onclick="goToEmail()">
+      OK
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+    <span class="btn-hint">press <strong>Enter ↵</strong></span>
+  </div>
+</div>
+ 
+<!-- EMAIL -->
+<div class="screen" id="screen-email">
+  <div class="q-number"><span>10</span><span class="arrow">→</span></div>
+  <h2 class="q-title" style="font-size:1.5rem;">Email*</h2>
+  <input type="email" class="text-input-field" id="inputEmail" placeholder="name@example.com" autocomplete="email">
+  <div class="error-msg" id="errEmail">Please enter a valid email address.</div>
+  <div class="nav-row">
+    <button class="btn-ok" onclick="submitForm()">
+      Submit
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+  </div>
+</div>
+ 
+<!-- RESULTS -->
+<div class="screen" id="screen-results">
+  <h1 class="results-title" id="resultsTitle">Your Faith at Work Profile</h1>
+  <div class="profile-label" id="profileLabel"></div>
+  <p class="results-desc" id="resultsDesc"></p>
+  <div class="score-display" id="scoreDisplay"></div>
+  <button class="btn" onclick="location.reload()">Take it again</button>
+</div>
+ 
+<script>
+const WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/25609723/u02m459/";
+ 
+const QUESTIONS = [
+  {
+    id: 1,
+    text: "When you face a difficult decision at work, what is your most honest first instinct?",
+    choices: [
+      "I analyze the data and go with what makes the most logical sense.",
+      "I think through it on my own, then maybe pray about it afterward.",
+      "I pause and ask God for wisdom before deciding, but I don't always wait for an answer.",
+      "I genuinely try to seek God's direction first and hold my own opinion loosely."
+    ]
+  },
+  {
+    id: 2,
+    text: "How would you describe the connection between your faith and your daily work life?",
+    choices: [
+      "They mostly stay separate. Work is work.",
+      "I try to act ethically at work because of my faith, but I don't think much beyond that.",
+      "I see my work as something God cares about, though I'm still figuring out what that means.",
+      "I believe my work is a calling, and I try to live that out intentionally every day."
+    ]
+  },
+  {
+    id: 3,
+    text: "Think about a recent conflict or tension with a coworker or employee. How did you handle it?",
+    choices: [
+      "I handled it the way I'd handle any professional situation — efficiently and directly.",
+      "I tried to be fair, though I didn't really bring my faith into how I responded",
+      "I was aware of wanting to respond with grace, even if I didn't fully succeed.",
+      "I genuinely tried to see them through God's eyes and lead the conversation with humility."
+    ]
+  },
+  {
+    id: 4,
+    text: "When your company succeeds — a big win, a strong quarter, a goal met — where does your mind first go?",
+    choices: [
+      "I feel proud and think about what comes next.",
+      "I'm grateful, though I don't often stop to acknowledge God specifically.",
+      "I try to give God credit, even if I don't always say it out loud.",
+      "I genuinely see success as a gift and reflect on how to steward it for something greater."
+    ]
+  },
+  {
+    id: 5,
+    text: "How do you think about the people who work for you or alongside you?",
+    choices: [
+      "They are talented people I respect. I try to treat them well.",
+      "I care about them personally, not just professionally.",
+      "I believe God placed them in my life and I have some responsibility toward them.",
+      "I see investing in the growth, dignity, and flourishing of my team as part of my calling."
+    ]
+  },
+  {
+    id: 6,
+    text: "How often does your faith community (church, small group, mentors) speak into your work life?",
+    choices: [
+      "Rarely. I don't really bring work into those spaces.",
+      "Sometimes — if a major work issue comes up, I might mention it.",
+      "Occasionally, but I'd like more of that kind of intentional community.",
+      "Regularly. I actively seek people who help me integrate faith and work."
+    ]
+  },
+  {
+    id: 7,
+    text: "When you imagine the legacy you want to leave through your work, what comes to mind?",
+    choices: [
+      "A successful company, a strong reputation, and financial security for my family.",
+      "A place people loved working and a body of work I'm proud of.",
+      "A business that made a real difference — for my team, my community, and something bigger.",
+      "A life of work that pointed others to God and helped build something that will outlast me."
+    ]
+  }
+];
+ 
+const PROFILES = [
+  {
+    minScore: 7, maxScore: 12,
+    label: "The Compartmentalizer",
+    desc: "Your faith is real and matters to you — but right now, it mostly lives in a separate space from your work. You lead with professionalism and competence, but the two worlds rarely intersect. There's an invitation here to start asking what it would look like to bring God into Monday, not just Sunday."
+  },
+  {
+    minScore: 13, maxScore: 18,
+    label: "The Ethical Leader",
+    desc: "Your faith shapes your values, and that shows in how you treat people and make decisions. You care about integrity and fairness. But faith hasn't yet moved from guiding your ethics to shaping your sense of mission. The next step might be exploring what it means to work as a calling, not just a career."
+  },
+  {
+    minScore: 19, maxScore: 24,
+    label: "The Integrator",
+    desc: "You're on the journey. You sense that faith and work belong together, and you're actively trying to live that out — even when it's messy. You pray, you reflect, you care about your team and your impact. Keep going. The integration you're seeking is worth the effort."
+  },
+  {
+    minScore: 25, maxScore: 28,
+    label: "The Kingdom Builder",
+    desc: "You see your work as a sacred trust. Your leadership is shaped by a deep conviction that God cares about what you build, who you build it with, and why. You're not just building a company — you're building something that will outlast you. You're exactly the kind of leader this moment needs."
+  }
+];
+ 
+// State
+let questionOrder = [];
+let currentQIndex = 0;
+let answers = {};  // questionId -> score (1-4)
+let currentStep = 'welcome'; // welcome | question | statement | firstname | lastname | email | results
+ 
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+ 
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  // Force reflow for animation
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = '';
+  el.classList.add('active');
+  updateProgress();
+}
+ 
+function updateProgress() {
+  const total = QUESTIONS.length + 4; // questions + statement + name + lastname + email
+  let done = 0;
+  if (currentStep === 'question') done = currentQIndex;
+  else if (currentStep === 'statement') done = QUESTIONS.length;
+  else if (currentStep === 'firstname') done = QUESTIONS.length + 1;
+  else if (currentStep === 'lastname') done = QUESTIONS.length + 2;
+  else if (currentStep === 'email') done = QUESTIONS.length + 3;
+  else if (currentStep === 'results') done = total;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+ 
+function startQuiz() {
+  questionOrder = shuffle(QUESTIONS);
+  currentQIndex = 0;
+  answers = {};
+  currentStep = 'question';
+  renderQuestion();
+  showScreen('question');
+}
+ 
+function renderQuestion() {
+  const q = questionOrder[currentQIndex];
+  document.getElementById('qNum').textContent = currentQIndex + 1;
+  document.getElementById('qTitle').textContent = q.text;
+  const container = document.getElementById('choicesContainer');
+  container.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.choices.forEach((text, i) => {
+    const div = document.createElement('div');
+    div.className = 'choice';
+    div.innerHTML = `<span class="choice-letter">${letters[i]}</span><span>${text}</span>`;
+    div.addEventListener('click', () => selectChoice(div, i + 1)); // score = index+1
+    container.appendChild(div);
+  });
+  document.getElementById('btnOk').disabled = true;
+}
+ 
+function selectChoice(el, score) {
+  document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[questionOrder[currentQIndex].id] = score;
+  document.getElementById('btnOk').disabled = false;
+}
+ 
+function nextStep() {
+  if (currentStep === 'question') {
+    if (answers[questionOrder[currentQIndex].id] == null) return;
+    currentQIndex++;
+    if (currentQIndex < QUESTIONS.length) {
+      renderQuestion();
+      showScreen('question');
+    } else {
+      currentStep = 'statement';
+      showScreen('statement');
+    }
+  }
+}
+ 
+function goToName() {
+  currentStep = 'firstname';
+  showScreen('firstname');
+  setTimeout(() => document.getElementById('inputFirstName').focus(), 100);
+}
+ 
+function goToLastName() {
+  const val = document.getElementById('inputFirstName').value.trim();
+  if (!val) { document.getElementById('errFirstName').classList.add('visible'); return; }
+  document.getElementById('errFirstName').classList.remove('visible');
+  currentStep = 'lastname';
+  showScreen('lastname');
+  setTimeout(() => document.getElementById('inputLastName').focus(), 100);
+}
+ 
+function goToEmail() {
+  const val = document.getElementById('inputLastName').value.trim();
+  if (!val) { document.getElementById('errLastName').classList.add('visible'); return; }
+  document.getElementById('errLastName').classList.remove('visible');
+  currentStep = 'email';
+  showScreen('email');
+  setTimeout(() => document.getElementById('inputEmail').focus(), 100);
+}
+ 
+async function submitForm() {
+  const email = document.getElementById('inputEmail').value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('errEmail').classList.add('visible');
+    return;
+  }
+  document.getElementById('errEmail').classList.remove('visible');
+ 
+  const firstName = document.getElementById('inputFirstName').value.trim();
+  const lastName = document.getElementById('inputLastName').value.trim();
+ 
+  const totalScore = Object.values(answers).reduce((a, b) => a + b, 0);
+  const profile = PROFILES.find(p => totalScore >= p.minScore && totalScore <= p.maxScore) || PROFILES[PROFILES.length - 1];
+ 
+  // Build detailed answer map
+  const answerDetails = {};
+  QUESTIONS.forEach(q => {
+    const score = answers[q.id];
+    if (score != null) {
+      answerDetails[`Q${q.id}`] = {
+        question: q.text,
+        answer: q.choices[score - 1],
+        score: score
+      };
+    }
+  });
+ 
+  const payload = {
+    firstName,
+    lastName,
+    email,
+    totalScore,
+    profile: profile.label,
+    answers: answerDetails,
+    submittedAt: new Date().toISOString()
+  };
+ 
+  // Show sending overlay
+  document.getElementById('sendingOverlay').classList.add('visible');
+ 
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    // Even on error, show results (webhook may still receive in no-cors mode)
+    console.warn('Webhook error:', e);
+  }
+ 
+  document.getElementById('sendingOverlay').classList.remove('visible');
+ 
+  // Show results
+  currentStep = 'results';
+  document.getElementById('resultsTitle').textContent = `${firstName}, we will be sending the results to your email shortly`;
+  showScreen('results');
+}
+ 
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (currentStep === 'welcome') { startQuiz(); return; }
+    if (currentStep === 'question') {
+      const ok = document.getElementById('btnOk');
+      if (!ok.disabled) nextStep();
+      return;
+    }
+    if (currentStep === 'statement') { goToName(); return; }
+    if (currentStep === 'firstname') { goToLastName(); return; }
+    if (currentStep === 'lastname') { goToEmail(); return; }
+    if (currentStep === 'email') { submitForm(); return; }
+  }
+  // Letter shortcuts for choices
+  if (currentStep === 'question') {
+    const keyMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+    const idx = keyMap[e.key.toLowerCase()];
+    if (idx !== undefined) {
+      const choices = document.querySelectorAll('.choice');
+      if (choices[idx]) choices[idx].click();
+    }
+  }
+});
+</script>
+</body>
+</html>
+ 
