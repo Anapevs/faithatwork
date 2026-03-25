@@ -32,7 +32,6 @@
     flex-direction: column;
   }
  
-  /* Progress bar */
   .progress-bar {
     position: fixed;
     top: 0; left: 0;
@@ -42,7 +41,6 @@
     z-index: 100;
   }
  
-  /* Screens */
   .screen {
     display: none;
     flex-direction: column;
@@ -62,7 +60,6 @@
     to { opacity: 1; transform: translateY(0); }
   }
  
-  /* Welcome screen */
   .welcome-title {
     font-family: 'Playfair Display', serif;
     font-size: 2.4rem;
@@ -80,7 +77,6 @@
     max-width: 560px;
   }
  
-  /* Question screen */
   .q-number {
     font-size: 0.85rem;
     color: var(--gold);
@@ -148,7 +144,6 @@
     flex-shrink: 0;
   }
  
-  /* Text input screens */
   .text-input-field {
     width: 100%;
     max-width: 520px;
@@ -166,7 +161,6 @@
   .text-input-field::placeholder { color: var(--muted); }
   .text-input-field:focus { border-bottom-color: var(--gold); }
  
-  /* Buttons */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -194,7 +188,6 @@
   }
   .btn-hint strong { color: var(--text); }
  
-  /* Nav row */
   .nav-row {
     display: flex;
     align-items: center;
@@ -218,7 +211,6 @@
   .btn-ok:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn-ok svg { width: 14px; height: 14px; }
  
-  /* Statement screen */
   .statement-icon {
     font-size: 2.4rem;
     color: var(--gold);
@@ -240,7 +232,6 @@
     margin-bottom: 2rem;
   }
  
-  /* Results screen */
   .results-title {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
@@ -268,7 +259,6 @@
     margin-bottom: 2rem;
   }
  
-  /* Sending overlay */
   .sending-overlay {
     position: fixed; inset: 0;
     background: rgba(250,250,248,0.9);
@@ -288,7 +278,6 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
  
-  /* Error */
   .error-msg {
     font-size: 0.85rem;
     color: #c0392b;
@@ -322,7 +311,7 @@
   </div>
 </div>
  
-<!-- QUESTION TEMPLATE (rendered by JS) -->
+<!-- QUESTION -->
 <div class="screen" id="screen-question">
   <div class="q-number"><span id="qNum"></span><span class="arrow">→</span></div>
   <h2 class="q-title" id="qTitle"></h2>
@@ -336,8 +325,9 @@
   </div>
 </div>
  
-<!-- STATEMENT (gate before name/email) -->
+<!-- STATEMENT -->
 <div class="screen" id="screen-statement">
+  <div class="statement-icon">"</div>
   <h2 class="statement-title">You're one step away from your results.</h2>
   <p class="statement-body">Enter your name and email to see your Faith at Work profile and to join a community of leaders who are learning to let God lead at work too.</p>
   <div style="display:flex;align-items:center;">
@@ -402,75 +392,76 @@
 <script>
 const WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/25609723/u02m459/";
  
+// CAMBIO 1: choices ahora son objetos { text, score }
 const QUESTIONS = [
   {
     id: 1,
     text: "When you face a difficult decision at work, what is your most honest first instinct?",
     choices: [
-      "I analyze the data and go with what makes the most logical sense.",
-      "I think through it on my own, then maybe pray about it afterward.",
-      "I pause and ask God for wisdom before deciding, but I don't always wait for an answer.",
-      "I genuinely try to seek God's direction first and hold my own opinion loosely."
+      { text: "I analyze the data and go with what makes the most logical sense.", score: 1 },
+      { text: "I think through it on my own, then maybe pray about it afterward.", score: 2 },
+      { text: "I pause and ask God for wisdom before deciding, but I don't always wait for an answer.", score: 3 },
+      { text: "I genuinely try to seek God's direction first and hold my own opinion loosely.", score: 4 }
     ]
   },
   {
     id: 2,
     text: "How would you describe the connection between your faith and your daily work life?",
     choices: [
-      "They mostly stay separate. Work is work.",
-      "I try to act ethically at work because of my faith, but I don't think much beyond that.",
-      "I see my work as something God cares about, though I'm still figuring out what that means.",
-      "I believe my work is a calling, and I try to live that out intentionally every day."
+      { text: "They mostly stay separate. Work is work.", score: 1 },
+      { text: "I try to act ethically at work because of my faith, but I don't think much beyond that.", score: 2 },
+      { text: "I see my work as something God cares about, though I'm still figuring out what that means.", score: 3 },
+      { text: "I believe my work is a calling, and I try to live that out intentionally every day.", score: 4 }
     ]
   },
   {
     id: 3,
     text: "Think about a recent conflict or tension with a coworker or employee. How did you handle it?",
     choices: [
-      "I handled it the way I'd handle any professional situation — efficiently and directly.",
-      "I tried to be fair, though I didn't really bring my faith into how I responded",
-      "I was aware of wanting to respond with grace, even if I didn't fully succeed.",
-      "I genuinely tried to see them through God's eyes and lead the conversation with humility."
+      { text: "I handled it the way I'd handle any professional situation — efficiently and directly.", score: 1 },
+      { text: "I tried to be fair, though I didn't really bring my faith into how I responded.", score: 2 },
+      { text: "I was aware of wanting to respond with grace, even if I didn't fully succeed.", score: 3 },
+      { text: "I genuinely tried to see them through God's eyes and lead the conversation with humility.", score: 4 }
     ]
   },
   {
     id: 4,
     text: "When your company succeeds — a big win, a strong quarter, a goal met — where does your mind first go?",
     choices: [
-      "I feel proud and think about what comes next.",
-      "I'm grateful, though I don't often stop to acknowledge God specifically.",
-      "I try to give God credit, even if I don't always say it out loud.",
-      "I genuinely see success as a gift and reflect on how to steward it for something greater."
+      { text: "I feel proud and think about what comes next.", score: 1 },
+      { text: "I'm grateful, though I don't often stop to acknowledge God specifically.", score: 2 },
+      { text: "I try to give God credit, even if I don't always say it out loud.", score: 3 },
+      { text: "I genuinely see success as a gift and reflect on how to steward it for something greater.", score: 4 }
     ]
   },
   {
     id: 5,
     text: "How do you think about the people who work for you or alongside you?",
     choices: [
-      "They are talented people I respect. I try to treat them well.",
-      "I care about them personally, not just professionally.",
-      "I believe God placed them in my life and I have some responsibility toward them.",
-      "I see investing in the growth, dignity, and flourishing of my team as part of my calling."
+      { text: "They are talented people I respect. I try to treat them well.", score: 1 },
+      { text: "I care about them personally, not just professionally.", score: 2 },
+      { text: "I believe God placed them in my life and I have some responsibility toward them.", score: 3 },
+      { text: "I see investing in the growth, dignity, and flourishing of my team as part of my calling.", score: 4 }
     ]
   },
   {
     id: 6,
     text: "How often does your faith community (church, small group, mentors) speak into your work life?",
     choices: [
-      "Rarely. I don't really bring work into those spaces.",
-      "Sometimes — if a major work issue comes up, I might mention it.",
-      "Occasionally, but I'd like more of that kind of intentional community.",
-      "Regularly. I actively seek people who help me integrate faith and work."
+      { text: "Rarely. I don't really bring work into those spaces.", score: 1 },
+      { text: "Sometimes — if a major work issue comes up, I might mention it.", score: 2 },
+      { text: "Occasionally, but I'd like more of that kind of intentional community.", score: 3 },
+      { text: "Regularly. I actively seek people who help me integrate faith and work.", score: 4 }
     ]
   },
   {
     id: 7,
     text: "When you imagine the legacy you want to leave through your work, what comes to mind?",
     choices: [
-      "A successful company, a strong reputation, and financial security for my family.",
-      "A place people loved working and a body of work I'm proud of.",
-      "A business that made a real difference — for my team, my community, and something bigger.",
-      "A life of work that pointed others to God and helped build something that will outlast me."
+      { text: "A successful company, a strong reputation, and financial security for my family.", score: 1 },
+      { text: "A place people loved working and a body of work I'm proud of.", score: 2 },
+      { text: "A business that made a real difference — for my team, my community, and something bigger.", score: 3 },
+      { text: "A life of work that pointed others to God and helped build something that will outlast me.", score: 4 }
     ]
   }
 ];
@@ -498,11 +489,10 @@ const PROFILES = [
   }
 ];
  
-// State
 let questionOrder = [];
 let currentQIndex = 0;
-let answers = {};  // questionId -> score (1-4)
-let currentStep = 'welcome'; // welcome | question | statement | firstname | lastname | email | results
+let answers = {};
+let currentStep = 'welcome';
  
 function shuffle(arr) {
   const a = [...arr];
@@ -516,7 +506,6 @@ function shuffle(arr) {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('screen-' + id);
-  // Force reflow for animation
   el.style.animation = 'none';
   el.offsetHeight;
   el.style.animation = '';
@@ -525,7 +514,7 @@ function showScreen(id) {
 }
  
 function updateProgress() {
-  const total = QUESTIONS.length + 4; // questions + statement + name + lastname + email
+  const total = QUESTIONS.length + 4;
   let done = 0;
   if (currentStep === 'question') done = currentQIndex;
   else if (currentStep === 'statement') done = QUESTIONS.length;
@@ -553,13 +542,17 @@ function renderQuestion() {
   const container = document.getElementById('choicesContainer');
   container.innerHTML = '';
   const letters = ['A', 'B', 'C', 'D'];
-  q.choices.forEach((text, i) => {
+ 
+  // CAMBIO 2: mezclar choices y usar choice.score en lugar del índice
+  const shuffledChoices = shuffle(q.choices);
+  shuffledChoices.forEach((choice, i) => {
     const div = document.createElement('div');
     div.className = 'choice';
-    div.innerHTML = `<span class="choice-letter">${letters[i]}</span><span>${text}</span>`;
-    div.addEventListener('click', () => selectChoice(div, i + 1)); // score = index+1
+    div.innerHTML = `<span class="choice-letter">${letters[i]}</span><span>${choice.text}</span>`;
+    div.addEventListener('click', () => selectChoice(div, choice.score));
     container.appendChild(div);
   });
+ 
   document.getElementById('btnOk').disabled = true;
 }
  
@@ -622,14 +615,14 @@ async function submitForm() {
   const totalScore = Object.values(answers).reduce((a, b) => a + b, 0);
   const profile = PROFILES.find(p => totalScore >= p.minScore && totalScore <= p.maxScore) || PROFILES[PROFILES.length - 1];
  
-  // Build detailed answer map
   const answerDetails = {};
   QUESTIONS.forEach(q => {
     const score = answers[q.id];
     if (score != null) {
+      const choiceObj = q.choices.find(c => c.score === score);
       answerDetails[`Q${q.id}`] = {
         question: q.text,
-        answer: q.choices[score - 1],
+        answer: choiceObj ? choiceObj.text : '',
         score: score
       };
     }
@@ -645,7 +638,6 @@ async function submitForm() {
     submittedAt: new Date().toISOString()
   };
  
-  // Show sending overlay
   document.getElementById('sendingOverlay').classList.add('visible');
  
   try {
@@ -656,19 +648,16 @@ async function submitForm() {
       body: JSON.stringify(payload)
     });
   } catch (e) {
-    // Even on error, show results (webhook may still receive in no-cors mode)
     console.warn('Webhook error:', e);
   }
  
   document.getElementById('sendingOverlay').classList.remove('visible');
  
-  // Show results
   currentStep = 'results';
   document.getElementById('resultsTitle').textContent = `${firstName}, we will be sending the results to your email shortly`;
   showScreen('results');
 }
  
-// Keyboard support
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     if (currentStep === 'welcome') { startQuiz(); return; }
@@ -682,7 +671,6 @@ document.addEventListener('keydown', (e) => {
     if (currentStep === 'lastname') { goToEmail(); return; }
     if (currentStep === 'email') { submitForm(); return; }
   }
-  // Letter shortcuts for choices
   if (currentStep === 'question') {
     const keyMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
     const idx = keyMap[e.key.toLowerCase()];
